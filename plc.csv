@@ -1,0 +1,13 @@
+tag,value,dtype
+zzzTestBool,True,BOOL
+zzzTestBool,1,BOOL
+zzzTestBool,0,BOOL
+zzzTestBool,False,BOOL
+zzzTestBool,FALSE,BOOL
+zzzTestBool,TRUE,BOol
+zzzTestBool,ok,BOOL
+zzzTestDint,12345,DINT
+zzzTestReal,12.345,REAL
+zzzTestReal,12,INT
+zzzTestReal,12,SINT
+zzzTestString,Hello,string

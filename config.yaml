@@ -1,0 +1,11 @@
+APP:
+  DEBUG: True
+  # Only accept True or False
+  IP: 10.221.44.10
+  # This sets the update rate
+  STREAMFREQ: 1
+  # The output file name (.csv appended in code)
+  OUTPUT: out
+  DEFAULT_INPUT: True
+  # The input file name (.csv appended in code)
+  INPUT: tags
