@@ -419,4 +419,5 @@ elif choice == 6:
         pass
         
 # output a user prompt to inform them the program is over
-input(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}\nPress any key to close window")
+print(f'{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}')
+input(f"Press any key to close window")
