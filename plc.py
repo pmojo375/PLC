@@ -231,7 +231,7 @@ elif choice == 4:
     if use_default:
         file_name = input_file
     else:
-        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter CSV file name with 'tag', 'value', and 'dtype' columns (must be in same directory as the script!):", end='') 
+        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter CSV file name with 'tag' and 'value' columns (must be in same directory as the script!):", end='') 
         file_name = input()
         # print a new line
         print()
