@@ -207,12 +207,15 @@ elif choice == 3:
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
     
     # iterate through the tags in the CSV file
-    for tag in df.iterrows():
-        if not debug:
-            # read and store the results
-            tagRead = plc.read(tag)
-            newData = {'tag': tagRead.tag, 'value': tagRead.value}
-        else:
+
+    if not debug:
+        with LogixDriver(ip) as plc:
+            for tag in df.iterrows():
+                # read and store the results
+                tagRead = plc.read(tag)
+                newData = {'tag': tagRead.tag, 'value': tagRead.value}
+    else:
+        for tag in df.iterrows():
             # print debug response if in debug mode and store the dummy results
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Reading value of {tag[0]} and writing output to {out}")
             newData = {'tag': tag[0], 'value': 'Tag Value'}
@@ -240,12 +243,14 @@ elif choice == 4:
         # print the debug response if in debug mode
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
     
-    # iterate through the tags read in the CSV file
-    for index, data in df.iterrows():
-        if not debug:
-            # write to the PLC
-            plc.write(data['tag'], cast(data['value']))
-        else:
+    if not debug:
+        with LogixDriver(ip) as plc:
+            # iterate through the tags read in the CSV file
+            for index, data in df.iterrows():
+                # write to the PLC
+                plc.write(data['tag'], cast(data['value']))
+    else:
+        for index, data in df.iterrows():
             # if in debug mode, print the debug text
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {data['tag']} with value {data['value']}")
             
