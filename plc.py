@@ -368,6 +368,8 @@ elif choice == 6:
     # use a try block to allow the user to exit the endless loop via CTRL + C
     try:
         while True:
+
+            data= {}
         
             # current date and time
             now = datetime.now()
@@ -377,9 +379,6 @@ elif choice == 6:
                 with LogixDriver(ip) as plc:
                     # outputs a list of results
                     tagsRead = plc.read(*tags)
-                
-                # print the results
-                print(tagsRead)
                 
                 # loop through the results and crawl through them to store
                 for result in tagsRead:
