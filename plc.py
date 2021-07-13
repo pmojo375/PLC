@@ -197,7 +197,7 @@ elif choice == 3:
         print() # print new line
     
     # use pandas to read csv file
-    df = pandas.read_csv(file_name, index_col='tag')
+    df = pandas.read_csv(file_name)
     
     # create empty data frame to aid in writing to CSV file
     dfOut = pandas.DataFrame()
@@ -213,12 +213,12 @@ elif choice == 3:
         data = {}
 
         with LogixDriver(ip) as plc:
-            for tag in df.iterrows():
+            for index, data in df.iterrows():
                 # read and store the results
-                tagRead = plc.read(tag[0])
+                tagRead = plc.read(data['tag'])
                 data = crawl_and_format(tagRead.value, 0, tagRead.tag, data)
                 newData = {'tag': tagRead.tag, 'value': data[f'{tagRead.tag}']}
-                
+
                 # write the stored results to the data frame and write to CSV file
                 dfOut = dfOut.append(newData, ignore_index = True)
                 dfOut.to_csv(out,index=False)
