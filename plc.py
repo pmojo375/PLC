@@ -55,13 +55,13 @@ def crawl_and_format(obj, layer, name, data):
         # iterate though the dictionary
         for key, value in obj.items():
             # call function again while incrementing layer
-            crawl_and_format(value, layer+1, f'{name}.{key}', data)
+            data = crawl_and_format(value, layer+1, f'{name}.{key}', data)
     # obj is a list
     elif type(obj) is list:
         print(f'{layer*tab}{name}[{len(obj)}]:')
         # iterate through the list
         for i, value in enumerate(obj):
-            crawl_and_format(value, layer+1, f'{name}[{i}]', data)
+            data = crawl_and_format(value, layer+1, f'{name}[{i}]', data)
     # obj is an elementary object
     else:
         print(f'{tab*layer}{name} = {obj}')
@@ -209,20 +209,29 @@ elif choice == 3:
     # iterate through the tags in the CSV file
 
     if not debug:
+
+        data = {}
+
         with LogixDriver(ip) as plc:
             for tag in df.iterrows():
                 # read and store the results
-                tagRead = plc.read(tag)
-                newData = {'tag': tagRead.tag, 'value': tagRead.value}
+                tagRead = plc.read(tag[0])
+                data = crawl_and_format(tagRead.value, 0, tagRead.tag, data)
+                newData = {'tag': tagRead.tag, 'value': data[f'{tagRead.tag}']}
+                
+                # write the stored results to the data frame and write to CSV file
+                dfOut = dfOut.append(newData, ignore_index = True)
+                dfOut.to_csv(out,index=False)
     else:
         for tag in df.iterrows():
             # print debug response if in debug mode and store the dummy results
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Reading value of {tag[0]} and writing output to {out}")
             newData = {'tag': tag[0], 'value': 'Tag Value'}
-        
-        # write the stored results to the data frame and write to CSV file
-        dfOut = dfOut.append(newData, ignore_index = True)
-        dfOut.to_csv(out,index=False)
+            
+            # write the stored results to the data frame and write to CSV file
+            dfOut = dfOut.append(newData, ignore_index = True)
+            dfOut.to_csv(out,index=False)
+
         
 # read multiple tags and their desired values from a CSV file and write to PLC
 # UNTESTED
