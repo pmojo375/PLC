@@ -82,6 +82,7 @@ input_file = config['APP']['INPUT']
 use_default = config['APP']['DEFAULT_INPUT']
 input_file = input_file + '.csv'
 streamtime = int(config['APP']['STREAMFREQ'])
+splitout = config['APP']['SPLITOUT']
 
 # MIT license text
 lic = Style.RESET_ALL + Style.BRIGHT + Fore.BLUE + Back.WHITE + "**************************************************************************************" + Style.RESET_ALL + "\n" \
@@ -199,38 +200,54 @@ elif choice == 3:
     # use pandas to read csv file
     df = pandas.read_csv(file_name)
     
-    # create empty data frame to aid in writing to CSV file
-    dfOut = pandas.DataFrame()
+    if not splitout:
+        # create empty data frame to aid in writing to CSV file
+        dfOut = pandas.DataFrame()
     
     if debug:
         # print debug response if in debug mode
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
-    
-    # iterate through the tags in the CSV file
 
     if not debug:
-
-        data = {}
-
         with LogixDriver(ip) as plc:
+            # iterate through the tags in the CSV file
             for index, data in df.iterrows():
                 # read and store the results
                 tagRead = plc.read(data['tag'])
-                data = crawl_and_format(tagRead.value, 0, tagRead.tag, data)
+                data = crawl_and_format(tagRead.value, 0, tagRead.tag, {})
                 newData = {'tag': tagRead.tag, 'value': data[f'{tagRead.tag}']}
+
+                if splitout:
+                    # create empty data frame to aid in writing to CSV file
+                    dfOut = pandas.DataFrame()
 
                 # write the stored results to the data frame and write to CSV file
                 dfOut = dfOut.append(newData, ignore_index = True)
-                dfOut.to_csv(out,index=False)
+
+                if splitout:
+                    out_name = tagRead.tag.replace(".", "_") + '.csv'
+                    dfOut.to_csv(out_name, index=False)
+                else:
+                    dfOut.to_csv(out, index=False)
     else:
+        # iterate through the tags in the CSV file
         for tag in df.iterrows():
             # print debug response if in debug mode and store the dummy results
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Reading value of {tag[0]} and writing output to {out}")
             newData = {'tag': tag[0], 'value': 'Tag Value'}
-            
+
+            if splitout:
+                # create empty data frame to aid in writing to CSV file
+                dfOut = pandas.DataFrame()
+                
             # write the stored results to the data frame and write to CSV file
             dfOut = dfOut.append(newData, ignore_index = True)
-            dfOut.to_csv(out,index=False)
+            
+            if splitout:
+                out_name = tagRead.tag.replace(".", "_") + '.csv'
+                dfOut.to_csv(out_name, index=False)
+            else:
+                dfOut.to_csv(out, index=False)
 
         
 # read multiple tags and their desired values from a CSV file and write to PLC
@@ -348,22 +365,33 @@ elif choice == 6:
     # use pandas to read tags from CSV file
     df = pandas.read_csv(file_name)
     
-    # create an empty data frame to store the results
-    dfOut = pandas.DataFrame()
+    if not splitout:
+        # create empty data frame to aid in writing to CSV file
+        dfOut = pandas.DataFrame()
     
     # create empty array to store the data
     tags = []
     
     # inform the user tags are being read
     print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}Reading tags\n")
+
+    indexes = {}
     
     # create the header and an array of the tags
     for index, data in df.iterrows():
         tags.append(data['tag'])
+        indexes[data['tag']] = index
     
     # print the results
     print('Reading the following tags:')
     print(f"{tags}\n")
+
+    if splitout:
+        dfOut = {}
+
+        for i in tags:
+            # create empty data frame to aid in writing to CSV file
+            dfOut[i] = pandas.DataFrame()
     
     # use a try block to allow the user to exit the endless loop via CTRL + C
     try:
@@ -382,10 +410,32 @@ elif choice == 6:
                 
                 # loop through the results and crawl through them to store
                 for result in tagsRead:
+
+                    if splitout:
+                        data = {}
+
                     data = crawl_and_format(result.value, 0, result.tag, data)
-                    
-                # add the timestamp to the results
-                data['timestamp'] = date_time
+
+                    # add the timestamp to the results
+                    data['timestamp'] = date_time
+
+                    if splitout:
+                        
+                        # append the results to an empty data frame
+                        dfOut[result.tag] = dfOut[result.tag].append(data, ignore_index = True)
+
+                        # shift column 'timestamp' to first position
+                        first_column = dfOut[result.tag].pop('timestamp')
+
+                        # insert column using insert(position, column_name, first_column) function
+                        dfOut[result.tag].insert(0, 'timestamp', first_column)
+
+                        out_name = result.tag.replace(".", "_") + '.csv'
+                        dfOut[result.tag].to_csv(out_name, index=False)
+
+                if not splitout:
+                    # add the timestamp to the results
+                    data['timestamp'] = date_time
                 
             else:
                 # if in debug mode, add the time stamp to the results
@@ -396,21 +446,40 @@ elif choice == 6:
                 for result in tags:
                     # store dummy result 'value'
                     data[result] = 'value'
-                        
-                # print the results
-                print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
-            
-            # append the results to an empty data frame
-            dfOut = dfOut.append(data, ignore_index = True)
-            
-            # shift column 'timestamp' to first position
-            first_column = dfOut.pop('timestamp')
 
-            # insert column using insert(position, column_name, first_column) function
-            dfOut.insert(0, 'timestamp', first_column)
+                    if splitout:
+                        
+                        # append the results to an empty data frame
+                        dfOut[result] = dfOut[result].append(data, ignore_index = True)
+
+                        # shift column 'timestamp' to first position
+                        first_column = dfOut[result].pop('timestamp')
+
+                        # insert column using insert(position, column_name, first_column) function
+                        dfOut[result].insert(0, 'timestamp', first_column)
+
+                        out_name = result.tag.replace(".", "_") + '.csv'
+                        dfOut[result].to_csv(out_name, index=False)
+
+                        # print the results
+                        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
+
+                if not splitout:
+                    # print the results
+                    print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
             
-            # output data to CSV file
-            dfOut.to_csv(out, index=False)
+            if not splitout:
+                # append the results to an empty data frame
+                dfOut = dfOut.append(data, ignore_index = True)
+                
+                # shift column 'timestamp' to first position
+                first_column = dfOut.pop('timestamp')
+
+                # insert column using insert(position, column_name, first_column) function
+                dfOut.insert(0, 'timestamp', first_column)
+
+                # output data to CSV file
+                dfOut.to_csv(out, index=False)
              
             # wait a number of seconds set in the config file
             time.sleep(streamtime)
