@@ -5,14 +5,18 @@ ip = '192.168.1.1'
 
 sg.theme('DarkAmber')   # Add a touch of color
 # All the stuff inside your window.
-layout = [[sg.Text('Read a single PLC tag'), sg.B('Read Single Tag', key='Read Tag')],
-          [sg.Text('Write a single PLC tag'), sg.B('Write Single Tag', key='Write Tag')],
-          [sg.Text('Read multiple PLC tags'), sg.B('Read Multiple Tags', key='Read Tags')],
-          [sg.Text('Write multiple PLC tags'), sg.B('Write Multiple Tags', key='Write Tags')],
-          [sg.Text('Trend a PLC tag'), sg.B('Trend Single Tag', key='Trend Tag')],
-          [sg.Text('Trend multiple PLC tags'), sg.B('Trend Multiple Tags', key='Trend Tags')],
-          [sg.Text('Get PLC tags'), sg.B('Get Tags', key='Get Tags')],
-          [sg.Button('Close')]]
+frame_layout = [[sg.In('IP Address', key='IP', size=(45,1))],
+               [sg.Checkbox('Output seperate CSV files?', key='Split'),sg.Spin([i for i in range(1,61)], initial_value=5, key='Streamtime'), sg.Text('Read Frequency')]]
+
+layout = [[sg.Frame('Config', frame_layout)],
+         [sg.Text('Read a single PLC tag:', size=(20,1)), sg.B('Read Single Tag', key='Read Tag', size=(20,1))],
+         [sg.Text('Write a single PLC tag:', size=(20,1)), sg.B('Write Single Tag', key='Write Tag', size=(20,1))],
+         [sg.Text('Read multiple PLC tags:', size=(20,1)), sg.B('Read Multiple Tags', key='Read Tags', size=(20,1))],
+         [sg.Text('Write multiple PLC tags:', size=(20,1)), sg.B('Write Multiple Tags', key='Write Tags', size=(20,1))],
+         [sg.Text('Trend a PLC tag:', size=(20,1)), sg.B('Trend Single Tag', key='Trend Tag', size=(20,1))],
+         [sg.Text('Trend multiple PLC tags:', size=(20,1)), sg.B('Trend Multiple Tags', key='Trend Tags', size=(20,1))],
+         [sg.Text('Get PLC tags:', size=(20,1)), sg.B('Get Tags', key='Get Tags', size=(20,1))],
+         [sg.Button('Close')]]
 
 # Create the Window
 window = sg.Window('PLC', layout)
