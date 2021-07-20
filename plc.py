@@ -149,7 +149,6 @@ def main():
     choice = int(input())
 
     # read a single tag
-    # WORKING
     if choice == 1:
         # request tag to read
         print(
@@ -157,19 +156,13 @@ def main():
         tag = input()
 
         if not debug:
-            with LogixDriver(ip) as plc:
-                tag = plc.read(tag)
-
-                # crawl though result (prints to terminal)
-                crawl(tag.value, 0, tag.tag)
-
+            read_tag(ip, tag)
         else:
             # print debug text when in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}\nDEBUG MODE\n")
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Reading {tag}")
 
     # write a single tag
-    # BELIEVED TO BE WORKING
     elif choice == 2:
         # request user input for the tag and desired value
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter tag name to write:\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}", end='')
@@ -181,9 +174,7 @@ def main():
         value = cast(value)
 
         if not debug:
-            # write the tag values to the PLC
-            with LogixDriver(ip) as plc:
-                plc.write(tag, value)
+            write_tag(ip, tag, value)
         else:
             # print debug output if in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}\nDEBUG MODE\n")
@@ -191,7 +182,6 @@ def main():
                 f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {tag} with value {value}")
 
     # read multiple tags from a CSV file and write the results to a CSV file
-    # WORKING
     elif choice == 3:
         # if config is set to use default file names, use them, otherwise request user imput
         if use_default:
@@ -201,40 +191,18 @@ def main():
             file_name = input()
             print()  # print new line
 
-        # use pandas to read csv file
-        df = pandas.read_csv(file_name)
-
-        if not splitout:
-            # create empty data frame to aid in writing to CSV file
-            dfOut = pandas.DataFrame()
-
         if debug:
             # print debug response if in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
 
         if not debug:
-            with LogixDriver(ip) as plc:
-                # iterate through the tags in the CSV file
-                for index, data in df.iterrows():
-                    # read and store the results
-                    tagRead = plc.read(data['tag'])
-                    data = crawl_and_format(tagRead.value, 0, tagRead.tag, {})
-                    newData = {'tag': tagRead.tag,
-                               'value': data[f'{tagRead.tag}']}
-
-                    if splitout:
-                        # create empty data frame to aid in writing to CSV file
-                        dfOut = pandas.DataFrame()
-
-                    # write the stored results to the data frame and write to CSV file
-                    dfOut = dfOut.append(newData, ignore_index=True)
-
-                    if splitout:
-                        out_name = tagRead.tag.replace(".", "_") + '.csv'
-                        dfOut.to_csv(out_name, index=False)
-                    else:
-                        dfOut.to_csv(out, index=False)
+            read_tags_from_CSV(file_name, ip)
         else:
+            # use pandas to read csv file
+            df = pandas.read_csv(file_name)
+
+            dfOut = pandas.DataFrame()
+
             # iterate through the tags in the CSV file
             for tag in df.iterrows():
                 # print debug response if in debug mode
@@ -256,7 +224,6 @@ def main():
                     dfOut.to_csv(out, index=False)
 
     # read multiple tags and their desired values from a CSV file and write to PLC
-    # UNTESTED
     elif choice == 4:
         # if using defult file names set in the config file, get the file name, otherwise request user input
         if use_default:
@@ -267,27 +234,22 @@ def main():
             # print a new line
             print()
 
-        # use pandas to read the CSV file
-        df = pandas.read_csv(file_name)
-
         if debug:
             # print the debug response if in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
 
         if not debug:
-            with LogixDriver(ip) as plc:
-                # iterate through the tags read in the CSV file
-                for index, data in df.iterrows():
-                    # write to the PLC
-                    plc.write(data['tag'], cast(data['value']))
+            write_tags_from_CSV(file_name, ip)
         else:
+            # use pandas to read the CSV file
+            df = pandas.read_csv(file_name)
+
             for index, data in df.iterrows():
                 # if in debug mode, print the debug text
                 print(
                     f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {data['tag']} with value {data['value']}")
 
     # monitor a single tag at a specified interval
-    # HALF WORKING
     elif choice == 5:
         # request the tag to monitor
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter tag name to read:\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}", end='')
@@ -508,6 +470,63 @@ def main():
     # output a user prompt to inform them the program is over
     print(f'{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}')
     input(f"Press any key to close window")
+
+
+def read_tag(ip, tag):
+    with LogixDriver(ip) as plc:
+        tag = plc.read(tag)
+
+        # crawl though result (prints to terminal)
+        crawl(tag.value, 0, tag.tag)
+
+
+def write_tag(ip, tag, value):
+    # write the tag values to the PLC
+    with LogixDriver(ip) as plc:
+        plc.write(tag, value)
+
+def read_tags_from_CSV(csv, ip, splitout):
+
+    # use pandas to read csv file
+    df = pandas.read_csv(csv)
+
+    dfOut = pandas.DataFrame()
+
+    with LogixDriver(ip) as plc:
+        # iterate through the tags in the CSV file
+        for index, data in df.iterrows():
+            # read and store the results
+            tagRead = plc.read(data['tag'])
+            data = crawl_and_format(tagRead.value, 0, tagRead.tag, {})
+            newData = {'tag': tagRead.tag,
+                       'value': data[f'{tagRead.tag}']}
+
+            if splitout:
+                # create empty data frame to aid in writing to CSV file
+                dfOut = pandas.DataFrame()
+
+            # write the stored results to the data frame and write to CSV file
+            dfOut = dfOut.append(newData, ignore_index=True)
+
+            if splitout:
+                out_name = tagRead.tag.replace(".", "_") + '.csv'
+                dfOut.to_csv(out_name, index=False)
+            else:
+                dfOut.to_csv(out, index=False)
+
+    return dfOut
+
+
+def write_tags_from_CSV(csv, ip):
+
+    # use pandas to read csv file
+    df = pandas.read_csv(csv)
+
+    with LogixDriver(ip) as plc:
+        # iterate through the tags read in the CSV file
+        for index, data in df.iterrows():
+            # write to the PLC
+            plc.write(data['tag'], cast(data['value']))
 
 
 def get_tags(ip):
