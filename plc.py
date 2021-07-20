@@ -491,5 +491,10 @@ def main():
     print(f'{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}')
     input(f"Press any key to close window")
 
+def get_tags(ip):
+    with LogixDriver(ip) as plc:
+        return plc.get_tag_list()
+
+
 if __name__ == "__main__":
     main()
