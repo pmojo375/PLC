@@ -1,6 +1,5 @@
 from pycomm3 import LogixDriver
 from pycomm3.logger import configure_default_logger
-import csv
 import pandas
 import yaml
 from colorama import init, Fore, Back, Style
@@ -25,20 +24,20 @@ def read_yaml(file_path):
 def crawl(obj, layer, name):
     # a 'tab' for formating the output
     tab = '    '
-    
+
     # obj is a dict
     if type(obj) is dict:
         print(f'{layer*tab}{name}:')
         # iterate though the dictionary
         for key, value in obj.items():
             # call function again while incrementing layer
-            crawl(value, layer+1, key)
+            crawl(value, layer + 1, key)
     # obj is a list
     elif type(obj) is list:
         print(f'{layer*tab}{name}:')
         # iterate through the list
         for value in obj:
-            crawl(value, layer+1, name)
+            crawl(value, layer + 1, name)
     # obj is an elementary object
     else:
         print(f'{tab*layer}{name} = {obj}')
@@ -48,28 +47,29 @@ def crawl(obj, layer, name):
 def crawl_and_format(obj, layer, name, data):
     # a 'tab' for formating the output
     tab = '    '
-    
+
     # obj is a dict
     if type(obj) is dict:
         print(f'{layer*tab}{name}:')
         # iterate though the dictionary
         for key, value in obj.items():
             # call function again while incrementing layer
-            data = crawl_and_format(value, layer+1, f'{name}.{key}', data)
+            data = crawl_and_format(value, layer + 1, f'{name}.{key}', data)
     # obj is a list
     elif type(obj) is list:
         print(f'{layer*tab}{name}[{len(obj)}]:')
         # iterate through the list
         for i, value in enumerate(obj):
-            data = crawl_and_format(value, layer+1, f'{name}[{i}]', data)
+            data = crawl_and_format(value, layer + 1, f'{name}[{i}]', data)
     # obj is an elementary object
     else:
         print(f'{tab*layer}{name} = {obj}')
-        data[f'{name}'] =  f'{obj}'
-    
+        data[f'{name}'] = f'{obj}'
+
     return data
 
-def main():  
+
+def main():
     # initialize the color text
     init(convert=True)
 
@@ -86,28 +86,28 @@ def main():
 
     # MIT license text
     lic = Style.RESET_ALL + Style.BRIGHT + Fore.BLUE + Back.WHITE + "**************************************************************************************" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   MIT License                                                                      *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   Copyright (c) 2021 Parker Mojsiejenko                                            *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   Permission is hereby granted, free of charge, to any person obtaining a copy     *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   of this software and associated documentation files (the \"Software\"), to deal    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   in the Software without restriction, including without limitation the rights     *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   copies of the Software, and to permit persons to whom the Software is            *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   furnished to do so, subject to the following conditions:                         *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   The above copyright notice and this permission notice shall be included in all   *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   copies or substantial portions of the Software.                                  *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   SOFTWARE.                                                                        *" + Style.RESET_ALL + "\n" \
-    + Style.BRIGHT + Fore.BLUE + Back.WHITE + "**************************************************************************************" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   MIT License                                                                      *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   Copyright (c) 2021 Parker Mojsiejenko                                            *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   Permission is hereby granted, free of charge, to any person obtaining a copy     *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   of this software and associated documentation files (the \"Software\"), to deal    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   in the Software without restriction, including without limitation the rights     *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell        *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   copies of the Software, and to permit persons to whom the Software is            *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   furnished to do so, subject to the following conditions:                         *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   The above copyright notice and this permission notice shall be included in all   *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   copies or substantial portions of the Software.                                  *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*                                                                                    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR       *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,         *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE      *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER           *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE    *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "*   SOFTWARE.                                                                        *" + Style.RESET_ALL + "\n" \
+        + Style.BRIGHT + Fore.BLUE + Back.WHITE + "**************************************************************************************" + Style.RESET_ALL + "\n" \
 
     # if running debug mode, inform the user and configure the logger
     if debug:
@@ -127,10 +127,12 @@ def main():
 
     # request the PLC IP address if not configured to be set in the config.yaml file
     if 'IP' not in config['APP']:
-        print("Please be sure to enter the correct IP address (followed by an \"/x\" with \"x\"")
+        print(
+            "Please be sure to enter the correct IP address (followed by an \"/x\" with \"x\"")
         print("being the slot number if using a chassis and not in slot 0) and include the")
         print("\".csv\" extention when entering your file name.\n")
-        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter IP address of your PLC:\n", end='')
+        print(
+            f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter IP address of your PLC:\n", end='')
         ip = input()
     else:
         ip = config['APP']['IP']
@@ -150,16 +152,17 @@ def main():
     # WORKING
     if choice == 1:
         # request tag to read
-        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter tag name to read:\n", end='')
+        print(
+            f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter tag name to read:\n", end='')
         tag = input()
 
         if not debug:
             with LogixDriver(ip) as plc:
                 tag = plc.read(tag)
-                
+
                 # crawl though result (prints to terminal)
                 crawl(tag.value, 0, tag.tag)
-                   
+
         else:
             # print debug text when in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}\nDEBUG MODE\n")
@@ -173,10 +176,10 @@ def main():
         tag = input()
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter value to write:\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}", end='')
         value = input()
-        
+
         # cast the value to the proper type
         value = cast(value)
-            
+
         if not debug:
             # write the tag values to the PLC
             with LogixDriver(ip) as plc:
@@ -184,7 +187,8 @@ def main():
         else:
             # print debug output if in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}\nDEBUG MODE\n")
-            print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {tag} with value {value}")
+            print(
+                f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {tag} with value {value}")
 
     # read multiple tags from a CSV file and write the results to a CSV file
     # WORKING
@@ -195,15 +199,15 @@ def main():
         else:
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter CSV file name with the first (and usually only) column being 'tag' (must be in same directory as the script!):\n", end='')
             file_name = input()
-            print() # print new line
-        
+            print()  # print new line
+
         # use pandas to read csv file
         df = pandas.read_csv(file_name)
-        
+
         if not splitout:
             # create empty data frame to aid in writing to CSV file
             dfOut = pandas.DataFrame()
-        
+
         if debug:
             # print debug response if in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
@@ -215,14 +219,15 @@ def main():
                     # read and store the results
                     tagRead = plc.read(data['tag'])
                     data = crawl_and_format(tagRead.value, 0, tagRead.tag, {})
-                    newData = {'tag': tagRead.tag, 'value': data[f'{tagRead.tag}']}
+                    newData = {'tag': tagRead.tag,
+                               'value': data[f'{tagRead.tag}']}
 
                     if splitout:
                         # create empty data frame to aid in writing to CSV file
                         dfOut = pandas.DataFrame()
 
                     # write the stored results to the data frame and write to CSV file
-                    dfOut = dfOut.append(newData, ignore_index = True)
+                    dfOut = dfOut.append(newData, ignore_index=True)
 
                     if splitout:
                         out_name = tagRead.tag.replace(".", "_") + '.csv'
@@ -232,24 +237,24 @@ def main():
         else:
             # iterate through the tags in the CSV file
             for tag in df.iterrows():
-                # print debug response if in debug mode and store the dummy results
-                print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Reading value of {tag[0]} and writing output to {out}")
+                # print debug response if in debug mode
+                print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE} \
+                    Reading value of {tag[0]} and writing output to {out}")
                 newData = {'tag': tag[0], 'value': 'Tag Value'}
 
                 if splitout:
                     # create empty data frame to aid in writing to CSV file
                     dfOut = pandas.DataFrame()
-                    
+
                 # write the stored results to the data frame and write to CSV file
-                dfOut = dfOut.append(newData, ignore_index = True)
-                
+                dfOut = dfOut.append(newData, ignore_index=True)
+
                 if splitout:
                     out_name = tagRead.tag.replace(".", "_") + '.csv'
                     dfOut.to_csv(out_name, index=False)
                 else:
                     dfOut.to_csv(out, index=False)
 
-            
     # read multiple tags and their desired values from a CSV file and write to PLC
     # UNTESTED
     elif choice == 4:
@@ -257,18 +262,18 @@ def main():
         if use_default:
             file_name = input_file
         else:
-            print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter CSV file name with 'tag' and 'value' columns (must be in same directory as the script!):\n", end='') 
+            print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter CSV file name with 'tag' and 'value' columns (must be in same directory as the script!):\n", end='')
             file_name = input()
             # print a new line
             print()
-        
+
         # use pandas to read the CSV file
         df = pandas.read_csv(file_name)
-        
+
         if debug:
             # print the debug response if in debug mode
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
-        
+
         if not debug:
             with LogixDriver(ip) as plc:
                 # iterate through the tags read in the CSV file
@@ -278,71 +283,76 @@ def main():
         else:
             for index, data in df.iterrows():
                 # if in debug mode, print the debug text
-                print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {data['tag']} with value {data['value']}")
-                
+                print(
+                    f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Writing {data['tag']} with value {data['value']}")
+
     # monitor a single tag at a specified interval
     # HALF WORKING
     elif choice == 5:
         # request the tag to monitor
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.GREEN}Enter tag name to read:\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}", end='')
         tag = input()
-        
+
         # print info to user
-        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}\nMonitoring tag, press CTRL+C to end stream\n")
-        
+        print(
+            f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}\nMonitoring tag, press CTRL+C to end stream\n")
+
         # if in debug mode, print the debug response
         if debug:
             print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n")
 
         # print the results
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}Reading {tag}\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}")
-        
+
         # create empty data frame
         dfOut = pandas.DataFrame()
-        
+
         # use try block to allow user to exit endless loop via CTRL + C
         try:
             while True:
                 # current date and time
                 now = datetime.now()
                 date_time = now.strftime("%m/%d/%Y %H:%M:%S")
-                
+
                 if not debug:
                     # read the tag from the PLC
                     with LogixDriver(ip) as plc:
                         result = plc.read(tag)
-                        
+
                         # crawl through the result and store results
-                        data = crawl_and_format(result.value, 0, result.tag, {})
-                        
+                        data = crawl_and_format(
+                            result.value, 0, result.tag, {})
+
                         # add the timestamp to the results
                         data['timestamp'] = date_time
-                        
+
                 else:
                     # dummy data to test
-                    dummy_data = {'Status': 0, 'RejectCode': 0, 'Model': {'Name': '', 'ModelNum': '', 'TallPart': False, 'ShortPart': False, 'UEF_Galv': False, 'UEF_Coated': False}, 'Barcode': '', 'Sta3000_HipotTestStatus': 0, 'Sta5000_LeakTestStatus': 0, 'Sta5000_EnclosureScrew1': {'Torque': 0.0, 'Angle': 0.0}, 'Sta5000_EnclosureScrew2': {'Torque': 0.0, 'Angle': 0.0}, 'Sta5000_EnclosureScrew3': {'Torque': 0.0, 'Angle': 0.0}, 'Sta5000_EnclosureScrew4': {'Torque': 0.0, 'Angle': 0.0}, 'Sta6000_HighVoltageTest': {'Status': 0, 'ContinuityTest': {'Status': '', 'Resistance': 0.0}, 'ACWTest': {'Status': '', 'Volts': 0.0, 'TotalAmps': 0.0, 'RealAmps': 0.0}, 'RunTest': {'Status': '', 'Volts': 0.0, 'Amps': 0.0, 'Watts': 0.0, 'RawVolts': 0.0, 'RawAmps': 0.0, 'RawWatts': 0.0, 'TestTime': 0.0, 'PowerFactor': 0.0}, 'PassedContinuity': False, 'PassedHiPot': False, 'PassedRun': False, 'VoltageInRange': False, 'CurrentInRange': False, 'PowerInRange': False}, 'Sta6000_LowVoltageTest': {'Status': 0, 'ContinuityTest': {'Status': '', 'Resistance': 0.0}, 'ACWTest': {'Status': '', 'Volts': 0.0, 'TotalAmps': 0.0, 'RealAmps': 0.0}, 'RunTest': {'Status': '', 'Volts': 0.0, 'Amps': 0.0, 'Watts': 0.0, 'RawVolts': 0.0, 'RawAmps': 0.0, 'RawWatts': 0.0, 'TestTime': 0.0, 'PowerFactor': 0.0}, 'PassedContinuity': False, 'PassedHiPot': False, 'PassedRun': False, 'VoltageInRange': False, 'CurrentInRange': False, 'PowerInRange': False}, 'Sta6000_LeakTestStatus': 0, 'Sta7000_TerminalPlateScrew': {'Torque': 0.0, 'Angle': 0.0}, 'Sta3000_Rework_Count': 0, 'Sta4000_UEFPlace_Status': 0, 'Sta5000_Rework_Status': 0, 'Sta6000_Lane_Status': 0, 'Sta2000_LoopNum': 0, 'Sta1000_ReleaseTime': {'Year': 0, 'Month': 0, 'Day': 0, 'Hour': 0, 'Minute': 0, 'Second': 0, 'Microsecond': 0}, 'Sta2000_ReleaseTime': {'Year': 0, 'Month': 0, 'Day': 0, 'Hour': 0, 'Minute': 0, 'Second': 0, 'Microsecond': 0}, 'Sta7000_UnloadTime': {'Year': 0, 'Month': 0, 'Day': 0, 'Hour': 0, 'Minute': 0, 'Second': 0, 'Microsecond': 0}, 'PalletNum': 0, 'TestRecord': {'Base': '', 'Matrix': '', 'DateTime': '', 'TestResults': [{'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}], 'TestLane': 0, 'MasterFail': 0, 'FailTest': 0, 'ProdLine': 74}, 'Tracking': 0}
-                    
+                    dummy_data = {'Status': 0, 'RejectCode': 0, 'Model': {'Name': '', 'ModelNum': '', 'TallPart': False, 'ShortPart': False, 'UEF_Galv': False, 'UEF_Coated': False}, 'Barcode': '', 'Sta3000_HipotTestStatus': 0, 'Sta5000_LeakTestStatus': 0, 'Sta5000_EnclosureScrew1': {'Torque': 0.0, 'Angle': 0.0}, 'Sta5000_EnclosureScrew2': {'Torque': 0.0, 'Angle': 0.0}, 'Sta5000_EnclosureScrew3': {'Torque': 0.0, 'Angle': 0.0}, 'Sta5000_EnclosureScrew4': {'Torque': 0.0, 'Angle': 0.0}, 'Sta6000_HighVoltageTest': {'Status': 0, 'ContinuityTest': {'Status': '', 'Resistance': 0.0}, 'ACWTest': {'Status': '', 'Volts': 0.0, 'TotalAmps': 0.0, 'RealAmps': 0.0}, 'RunTest': {'Status': '', 'Volts': 0.0, 'Amps': 0.0, 'Watts': 0.0, 'RawVolts': 0.0, 'RawAmps': 0.0, 'RawWatts': 0.0, 'TestTime': 0.0, 'PowerFactor': 0.0}, 'PassedContinuity': False, 'PassedHiPot': False, 'PassedRun': False, 'VoltageInRange': False, 'CurrentInRange': False, 'PowerInRange': False}, 'Sta6000_LowVoltageTest': {'Status': 0, 'ContinuityTest': {'Status': '', 'Resistance': 0.0}, 'ACWTest': {'Status': '', 'Volts': 0.0, 'TotalAmps': 0.0, 'RealAmps': 0.0}, 'RunTest': {'Status': '', 'Volts': 0.0, 'Amps': 0.0, 'Watts': 0.0, 'RawVolts': 0.0, 'RawAmps': 0.0, 'RawWatts': 0.0, 'TestTime': 0.0, 'PowerFactor': 0.0}, 'PassedContinuity': False, 'PassedHiPot': False, 'PassedRun': False, 'VoltageInRange': False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       'CurrentInRange': False, 'PowerInRange': False}, 'Sta6000_LeakTestStatus': 0, 'Sta7000_TerminalPlateScrew': {'Torque': 0.0, 'Angle': 0.0}, 'Sta3000_Rework_Count': 0, 'Sta4000_UEFPlace_Status': 0, 'Sta5000_Rework_Status': 0, 'Sta6000_Lane_Status': 0, 'Sta2000_LoopNum': 0, 'Sta1000_ReleaseTime': {'Year': 0, 'Month': 0, 'Day': 0, 'Hour': 0, 'Minute': 0, 'Second': 0, 'Microsecond': 0}, 'Sta2000_ReleaseTime': {'Year': 0, 'Month': 0, 'Day': 0, 'Hour': 0, 'Minute': 0, 'Second': 0, 'Microsecond': 0}, 'Sta7000_UnloadTime': {'Year': 0, 'Month': 0, 'Day': 0, 'Hour': 0, 'Minute': 0, 'Second': 0, 'Microsecond': 0}, 'PalletNum': 0, 'TestRecord': {'Base': '', 'Matrix': '', 'DateTime': '', 'TestResults': [{'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}, {'Status': 0, 'Value': 0.0}], 'TestLane': 0, 'MasterFail': 0, 'FailTest': 0, 'ProdLine': 74}, 'Tracking': 0}
+
                     data = {}
-                    data = crawl_and_format(dummy_data, 0, 'PalletRecords[1]', data)
-                    
+                    data = crawl_and_format(
+                        dummy_data, 0, 'PalletRecords[1]', data)
+
                     # add the timestamp to the results
                     data['timestamp'] = date_time
-                    
+
                 # append data to the data frame
                 dfOut = dfOut.append(data, ignore_index=True)
-                
+
                 # shift column 'timestamp' to first position
                 first_column = dfOut.pop('timestamp')
 
                 # insert column using insert(position, column_name, first_column) function
                 dfOut.insert(0, 'timestamp', first_column)
-                
+
                 # output to CSV file
                 dfOut.to_csv(out, index=False)
-                
+
                 # sleep a number of seconds set in the config file
                 time.sleep(streamtime)
-                
+
         except KeyboardInterrupt:
             pass
 
@@ -356,32 +366,34 @@ def main():
             file_name = input()
 
         # make user aware of how to end loop
-        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Streaming tags, press CTRL+C to end stream\n")
-           
+        print(
+            f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}Streaming tags, press CTRL+C to end stream\n")
+
         # print debug message if running in debug mode
         if debug:
-            print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}")
-        
+            print(
+                f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.RED}DEBUG MODE\n{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}")
+
         # use pandas to read tags from CSV file
         df = pandas.read_csv(file_name)
-        
+
         if not splitout:
             # create empty data frame to aid in writing to CSV file
             dfOut = pandas.DataFrame()
-        
+
         # create empty array to store the data
         tags = []
-        
+
         # inform the user tags are being read
         print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}Reading tags\n")
 
         indexes = {}
-        
+
         # create the header and an array of the tags
         for index, data in df.iterrows():
             tags.append(data['tag'])
             indexes[data['tag']] = index
-        
+
         # print the results
         print('Reading the following tags:')
         print(f"{tags}\n")
@@ -392,43 +404,46 @@ def main():
             for i in tags:
                 # create empty data frame to aid in writing to CSV file
                 dfOut[i] = pandas.DataFrame()
-        
+
         # use a try block to allow the user to exit the endless loop via CTRL + C
         try:
             while True:
 
-                data= {}
-            
+                data = {}
+
                 # current date and time
                 now = datetime.now()
                 date_time = now.strftime("%m/%d/%Y %H:%M:%S")
-                
+
                 if not debug:
                     with LogixDriver(ip) as plc:
                         # outputs a list of results
                         tagsRead = plc.read(*tags)
-                    
+
                     # loop through the results and crawl through them to store
                     for result in tagsRead:
 
                         if splitout:
                             data = {}
 
-                        data = crawl_and_format(result.value, 0, result.tag, data)
+                        data = crawl_and_format(
+                            result.value, 0, result.tag, data)
 
                         # add the timestamp to the results
                         data['timestamp'] = date_time
 
                         if splitout:
-                            
+
                             # append the results to an empty data frame
-                            dfOut[result.tag] = dfOut[result.tag].append(data, ignore_index = True)
+                            dfOut[result.tag] = dfOut[result.tag].append(
+                                data, ignore_index=True)
 
                             # shift column 'timestamp' to first position
                             first_column = dfOut[result.tag].pop('timestamp')
 
                             # insert column using insert(position, column_name, first_column) function
-                            dfOut[result.tag].insert(0, 'timestamp', first_column)
+                            dfOut[result.tag].insert(
+                                0, 'timestamp', first_column)
 
                             out_name = result.tag.replace(".", "_") + '.csv'
                             dfOut[result.tag].to_csv(out_name, index=False)
@@ -436,21 +451,22 @@ def main():
                     if not splitout:
                         # add the timestamp to the results
                         data['timestamp'] = date_time
-                    
+
                 else:
                     # if in debug mode, add the time stamp to the results
                     data = {}
                     data['timestamp'] = date_time
-                        
+
                     # loop throught the tags read from the CSV file
                     for result in tags:
                         # store dummy result 'value'
                         data[result] = 'value'
 
                         if splitout:
-                            
+
                             # append the results to an empty data frame
-                            dfOut[result] = dfOut[result].append(data, ignore_index = True)
+                            dfOut[result] = dfOut[result].append(
+                                data, ignore_index=True)
 
                             # shift column 'timestamp' to first position
                             first_column = dfOut[result].pop('timestamp')
@@ -462,16 +478,18 @@ def main():
                             dfOut[result].to_csv(out_name, index=False)
 
                             # print the results
-                            print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
+                            print(
+                                f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
 
                     if not splitout:
                         # print the results
-                        print(f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
-                
+                        print(
+                            f"{Style.RESET_ALL}{Style.BRIGHT}{Fore.WHITE}{data}")
+
                 if not splitout:
                     # append the results to an empty data frame
-                    dfOut = dfOut.append(data, ignore_index = True)
-                    
+                    dfOut = dfOut.append(data, ignore_index=True)
+
                     # shift column 'timestamp' to first position
                     first_column = dfOut.pop('timestamp')
 
@@ -480,16 +498,17 @@ def main():
 
                     # output data to CSV file
                     dfOut.to_csv(out, index=False)
-                 
+
                 # wait a number of seconds set in the config file
                 time.sleep(streamtime)
-                
+
         except KeyboardInterrupt:
             pass
-            
+
     # output a user prompt to inform them the program is over
     print(f'{Style.RESET_ALL}{Style.BRIGHT}{Fore.YELLOW}')
     input(f"Press any key to close window")
+
 
 def get_tags(ip):
     with LogixDriver(ip) as plc:
