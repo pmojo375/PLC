@@ -1,7 +1,7 @@
 APP:
   DEBUG: False
   # Only accept True or False
-  IP: 172.16.9.1
+  IP: 10.221.44.11
   # This sets the update rate
   STREAMFREQ: 1
   # The output file name (.csv appended in code)
