@@ -7,8 +7,85 @@ import yaml
 import socket
 from pprint import pformat
 from apscheduler.schedulers.background import BackgroundScheduler
+from bs4 import BeautifulSoup
+import csv
+import re
 
 scheduler = BackgroundScheduler()
+soup = None
+l5x_tags = None
+
+
+def data_entered(data):
+    if data == '':
+        return False
+    else:
+        return True 
+
+
+def read_L5X(file_name):
+    
+    with open(file_name, encoding='utf-8') as plc:
+        soup = BeautifulSoup(plc, 'lxml-xml')
+
+    return soup
+
+
+def find_all_tags(soup):
+    tags = soup.find_all(find_tags)
+
+    return_tags = []
+
+    for tag in tags:
+        print(tag['Name'])
+        return_tags.append(tag['Name'])
+
+    return return_tags
+
+
+def find_tags(tag):
+    if tag.name == 'Tag' and tag.has_attr('DataType'):
+        if tag['DataType'] == f'{datatype}':
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def search_routines(routine_name, soup, tags):
+    # get routines to search
+
+    if routine_name == '':
+        routines = soup.find_all('Routine')
+    else:
+        routines = soup.find_all('Routine', Name=lambda name: routine_name in name)
+
+    rung_text = []
+
+    for routine in routines:
+        all_text = routine.find_all('Text')
+        for text in all_text:
+            rung_text.append(text)
+
+    found_tags = []
+
+    for tag in tags:
+        for rung in rung_text:
+            logic = rung.get_text()
+
+            if tag in logic:
+                found_tags.append(tag)
+                break
+
+    missing_tags = []
+
+    for tag in tags:
+        if not tag in found_tags:
+            print(f'{tag}')
+            missing_tags.append(tag)
+
+    return missing_tags
 
 
 def valid_ip(address):
@@ -17,6 +94,7 @@ def valid_ip(address):
         return True
     except:
         return False
+
 
 # reads the config yaml file
 def read_yaml(file_path):
@@ -39,14 +117,22 @@ ip = config['APP']['IP']
 readtag = config['APP']['READTAG']
 plc_connection = None
 
-
 def make_main_window():
-    frame_layout = [[sg.T('IP Address:', size=(15, 1)), sg.In(ip, key='-IP-', size=(27, 1))],
+
+    frame_layout1 = [[sg.T('You must specify and read the PLC L5X file before you can search. Select file below and press the "Read" button to enable the features below.', size=(63, 2))],
+                   [sg.Text('L5X File'), sg.Input(key='-L5X-'), sg.FileBrowse(), sg.B('Read', key='-READFILE-', size=(5,1))], 
+                   [sg.T('L5X FILE NOT READ', key='-FILEREAD-', justification='center', size=(63,1))]]
+
+    tab_layout1 = [[sg.Frame('Initial Read', frame_layout1)],
+             [sg.T('Datatype', size=(14, 1), justification='right'), sg.I('Cylinder', key='-DATATYPE-', disabled=True, size=(41, 1)), sg.B('Find Instances', key='-FIND-', disabled=True, size=(11, 1))],
+             [sg.T('Routine To Search', size=(14, 1), justification='right'), sg.I('R05_Faults', key='-ROUTINE-', disabled=True, size=(41, 1)), sg.B('Search', key='-SEARCH-', disabled=True, size=(11, 1))]]
+
+    frame_layout2 = [[sg.T('IP Address:', size=(15, 1)), sg.In(ip, key='-IP-', size=(27, 1))],
                     [sg.T('Output Filename:', size=(15, 1)), sg.In(
                         key='-OUTFILENAME-', size=(27, 1))],
                     [sg.Checkbox('Output seperate CSV files?', key='-SPLIT-'), sg.Spin([i for i in range(1, 61)], initial_value=1, key='-FREQ-'), sg.Text('Read Frequency')]]
 
-    layout = [[sg.Frame('Config', frame_layout)],
+    tab_layout2 = [[sg.Frame('Config', frame_layout2)],
               [sg.Text('Read a single PLC tag:', size=(20, 1)), sg.B(
                   'Read Single Tag', key='-READTAG-', size=(20, 1))],
               [sg.Text('Write a single PLC tag:', size=(20, 1)), sg.B(
@@ -60,8 +146,9 @@ def make_main_window():
               [sg.Text('Trend multiple PLC tags:', size=(20, 1)), sg.B(
                   'Trend Multiple Tags', key='-TRENDTAGS-', size=(20, 1))],
               [sg.Text('Get PLC tags:', size=(20, 1)), sg.B(
-                  'Get Tags', key='-GETTAGS-', size=(20, 1))],
-              [sg.Button('Close')]]
+                  'Get Tags', key='-GETTAGS-', size=(20, 1))]]
+
+    layout = [[sg.TabGroup([[sg.Tab('PLC', tab_layout2), sg.Tab('L5X', tab_layout1)]])], [sg.Button('Close')]]
 
     return sg.Window('PLC', layout, finalize=True)
 
@@ -117,15 +204,20 @@ def trend_tags():
 # Create the Window
 main_window, trend_window = make_main_window(), None
 
+status = main_window['-FILEREAD-']
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
     window, event, values = sg.read_all_windows()
 
+    print(window)
     if window == main_window:
         ip = values['-IP-']
         freq = float(values['-FREQ-'])
         split = values['-SPLIT-']
         output_filename = values['-OUTFILENAME-']
+        file_name = values['-L5X-']
+        routine_name = values['-ROUTINE-']
+        datatype = values['-DATATYPE-']
 
         if not data_entered(output_filename):
             output_filename = 'out.csv'
@@ -260,6 +352,25 @@ while True:
         else:
             sg.popup('Enter a valid IP Address')
 
+    if event == '-FIND-':
+        l5x_tags = find_all_tags(soup)
+
+    if event == '-READFILE-':
+        soup = read_L5X(file_name)
+
+    if event == '-SEARCH-':
+        missing = search_routines(routine_name, soup, l5x_tags)
+
+    if window == main_window and not soup == None:
+        status.update(value='L5X READ')
+
+        window['-FIND-'].update(disabled=False)
+        window['-DATATYPE-'].update(disabled=False)
+
+    if window == main_window and not l5x_tags == None:
+        window['-SEARCH-'].update(disabled=False)
+        window['-ROUTINE-'].update(disabled=False)
+
     # Trend window stuff
     if window == trend_window and event in (sg.WIN_CLOSED, '-STOP-'):
         trend_window.close()
@@ -273,4 +384,5 @@ while True:
         plc_connection.close()
 
     print('Loop End')
+
 main_window.close()
